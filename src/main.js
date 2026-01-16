@@ -6,7 +6,9 @@ const wordContainer = document.getElementById("wordContainer");
 
 const randomWordFunc = () => words[Math.floor(Math.random() * 3598)].split('')
 let randomWord = [];
-let attempts = 0;
+let underscoreWord = [];
+let constantWord = [];
+let attempts = 10;
 
 letters.forEach(letter  => {
     const letterDiv = document.createElement("div")
@@ -28,19 +30,29 @@ function checkCorrect(word, letter) {
                 word.splice(word.indexOf(letter.toLowerCase()), 1)
             }
         }
+        for (let i = 0; i < constantWord.length; i++) {
+            if (letter.toLowerCase() === constantWord[i]) {
+                underscoreWord[i] = constantWord[i];
+                wordContainer.children[i].textContent = letter;
+            }
+        }
+
         console.log(word)
         console.log("Correct letter")
     } else {
         console.log("Wrong letter")
-        attempts ++;
+        attempts --;
+        document.getElementById("attCount").textContent = attempts;
     }
     victory(word, attempts)
+    console.log(underscoreWord)
 }
 
 function previewWord(word) {
     wordContainer.innerHTML = "";
 
     for (let letter of word) {
+        underscoreWord.push("_")
         const letterDiv = document.createElement("div")
         letterDiv.textContent = "_"
         letterDiv.classList.add("letterOfWord")
@@ -51,7 +63,7 @@ function previewWord(word) {
 function victory(word) {
     if (word.length === 0) {
         showOverlay("Congratulations! You won")
-    } else if (attempts === 10) {
+    } else if (attempts === 0) {
         showOverlay("Oops! You lost")
     }
 }
@@ -82,9 +94,13 @@ function showOverlay(isWon) {
 
 function startGame() {
     wordContainer.innerHTML = "";
-    attempts = 0;
+    attempts = 10;
+    document.getElementById("attCount").textContent = attempts;
+    underscoreWord = [];
 
     randomWord = randomWordFunc();
+    constantWord = [...randomWord];
+
     previewWord(randomWord)
 
     console.log(randomWord);
@@ -92,3 +108,5 @@ function startGame() {
 
 
 startGame()
+
+console.log(underscoreWord)
