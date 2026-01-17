@@ -16,6 +16,7 @@ letters.forEach(letter  => {
     letterDiv.classList.add("letterOfChoice")
     letterDiv.addEventListener("click", () => {
         checkCorrect(randomWord, letter)
+        letterDiv.classList.add("pressedLetter")
     })
 
     if (lettersContainer) {
@@ -73,9 +74,16 @@ function showOverlay(isWon) {
     overlayScreen.classList.add("overlay")
 
     const overlayContent = document.createElement("div")
+    overlayContent.classList.add("overlayContent")
 
-    const overlayMessage = document.createElement("p")
-    overlayMessage.textContent = isWon
+    const isWinMessage = document.createElement("p")
+    isWinMessage.textContent = isWon;
+    isWinMessage.classList.add("isWinMessage")
+
+    const guessedWord = document.createElement("p")
+    guessedWord.textContent = `The hidden word was: ${toUpper(constantWord)}`;
+    guessedWord.classList.add("guessedWord")
+    /*Тоже добавить блок "загаданное слово = constantWord"*/
 
     const overlayScreenBtn = document.createElement("button")
     overlayScreenBtn.classList.add("overlayBtn")
@@ -87,9 +95,15 @@ function showOverlay(isWon) {
     })
 
     overlayContent.appendChild(overlayScreenBtn)
-    overlayContent.appendChild(overlayMessage)
+    overlayContent.appendChild(isWinMessage)
+    overlayContent.appendChild(guessedWord)
     overlayScreen.appendChild(overlayContent)
     document.body.appendChild(overlayScreen)
+}
+
+function toUpper(word) {
+    word = word.join('');
+    return word[0].toUpperCase() + word.slice(1).toLowerCase();
 }
 
 function startGame() {
@@ -102,7 +116,8 @@ function startGame() {
     constantWord = [...randomWord];
 
     previewWord(randomWord)
-
+    document.querySelectorAll(".pressedLetter").forEach(
+        element => {element.classList.remove("pressedLetter")});
     console.log(randomWord);
 }
 
