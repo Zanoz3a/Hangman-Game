@@ -8,21 +8,36 @@ const randomWordFunc = () => words[Math.floor(Math.random() * 3598)].split('')
 let randomWord = [];
 let underscoreWord = [];
 let constantWord = [];
+let alreadyPressed = [];
 let attempts = 10;
 
-letters.forEach(letter  => {
+letters.forEach(tapLetter  => {
     const letterDiv = document.createElement("div")
-    letterDiv.textContent = letter
+    letterDiv.textContent = tapLetter
     letterDiv.classList.add("letterOfChoice")
     letterDiv.addEventListener("click", () => {
-        checkCorrect(randomWord, letter)
+        checkCorrect(randomWord, tapLetter)
         letterDiv.classList.add("pressedLetter")
+        alreadyPressed.push(letterDiv.textContent)
     })
 
     if (lettersContainer) {
         lettersContainer.appendChild(letterDiv)
     }
 })
+
+function keyPressed(e) {
+    const keyLetter = e.key.toUpperCase();
+    if (letters.includes(keyLetter) && !alreadyPressed.includes(keyLetter)) {
+        checkCorrect(randomWord, keyLetter)
+        document.querySelectorAll(".letterOfChoice").forEach(letter => {
+            if (letter.textContent === keyLetter.toUpperCase()) {
+                letter.classList.add("pressedLetter")
+                alreadyPressed.push(letter.textContent)
+            }
+        })
+    }
+}
 
 function checkCorrect(word, letter) {
     if (word.includes(letter.toLowerCase())) {
@@ -64,8 +79,14 @@ function previewWord(word) {
 function victory(word) {
     if (word.length === 0) {
         showOverlay("Congratulations! You won")
+
+        document.removeEventListener("keydown", keyPressed);
+        document.addEventListener("keydown", restartByRKey);
     } else if (attempts === 0) {
         showOverlay("Oops! You lost")
+
+        document.removeEventListener("keydown", keyPressed);
+        document.addEventListener("keydown", restartByRKey);
     }
 }
 
@@ -84,6 +105,7 @@ function showOverlay(isWon) {
     guessedWord.textContent = `The hidden word was: ${toUpper(constantWord)}`;
     guessedWord.classList.add("guessedWord")
     /*Тоже добавить блок "загаданное слово = constantWord"*/
+    /*Нахуя я это написал?*/
 
     const overlayScreenBtn = document.createElement("button")
     overlayScreenBtn.classList.add("overlayBtn")
@@ -99,6 +121,14 @@ function showOverlay(isWon) {
     overlayContent.appendChild(guessedWord)
     overlayScreen.appendChild(overlayContent)
     document.body.appendChild(overlayScreen)
+
+}
+
+function restartByRKey(e) {
+    if (e.key === "r") {
+        startGame()
+        document.querySelector(".overlay").remove()
+    }
 }
 
 function toUpper(word) {
@@ -111,9 +141,13 @@ function startGame() {
     attempts = 10;
     document.getElementById("attCount").textContent = attempts;
     underscoreWord = [];
+    alreadyPressed = [];
 
     randomWord = randomWordFunc();
     constantWord = [...randomWord];
+
+    document.addEventListener("keydown", keyPressed);
+    document.removeEventListener("keydown", restartByRKey);
 
     previewWord(randomWord)
     document.querySelectorAll(".pressedLetter").forEach(
